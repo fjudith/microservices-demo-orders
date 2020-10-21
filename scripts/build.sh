@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
-IMAGE=orders
-
 set -ev
+
+export BUILD_VERSION="0.0.2-SNAPSHOT"
+export BUILD_DATE=`date +%Y-%m-%dT%T%z`
 
 SCRIPT_DIR=$(dirname "$0")
 
@@ -23,10 +24,15 @@ else
 fi
 CODE_DIR=$(cd $SCRIPT_DIR/..; pwd)
 echo $CODE_DIR
-$DOCKER_CMD run --rm -v $HOME/.m2:/root/.m2 -v $CODE_DIR:/usr/src/mymaven -w /usr/src/mymaven maven:3.2-jdk-8 mvn -DskipTests package
+$DOCKER_CMD run --rm -v $HOME/.m2:/root/.m2 -v $CODE_DIR:/usr/src/mymaven -w /usr/src/mymaven maven:3.6-jdk-11 mvn -q -DskipTests package
 
-cp -r $CODE_DIR/docker $CODE_DIR/target/docker/
-cp -r $CODE_DIR/target/*.jar $CODE_DIR/target/docker/${IMAGE}
+cp $CODE_DIR/target/*.jar $CODE_DIR/docker/orders
 
-REPO=${GROUP}/${IMAGE}
-    $DOCKER_CMD build -t ${REPO}:${COMMIT} $CODE_DIR/target/docker/${IMAGE};
+for m in ./docker/*/; do
+    REPO=${GROUP}/$(basename $m)
+    $DOCKER_CMD build \
+      --build-arg BUILD_VERSION=$BUILD_VERSION \
+      --build-arg BUILD_DATE=$BUILD_DATE \
+      --build-arg COMMIT=$COMMIT \
+      -t ${REPO}:${COMMIT} $CODE_DIR/$m;
+done;
