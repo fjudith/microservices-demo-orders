@@ -63,7 +63,7 @@ class OrdersContainerTest(unittest.TestCase):
                    self.payment_mock.container_name,
                    '--link',
                    self.shipping_mock.container_name,
-                   'weaveworksdemos/orders:' + self.COMMIT]
+                   OrdersContainerTest.GROUP + '/orders:' + self.COMMIT]
         Docker().execute(command, dump_streams=True)
         self.ip = Docker().get_container_ip(OrdersContainerTest.container_name)
 
@@ -103,6 +103,7 @@ if __name__ == '__main__':
         OrdersContainerTest.TAG = default_tag
 
     OrdersContainerTest.COMMIT = os.environ["COMMIT"]
+    OrdersContainerTest.GROUP = os.environ["GROUP"]
     # Now set the sys.argv to the unittest_args (leaving sys.argv[0] alone)
     sys.argv[1:] = args.unittest_args
     unittest.main()
