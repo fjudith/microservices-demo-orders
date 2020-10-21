@@ -31,5 +31,6 @@ $DOCKER_CMD run \
     -e TRAVIS_PULL_REQUEST=$TRAVIS_PULL_REQUEST \
     -e TRAVIS=$TRAVIS \
     -e COMMIT=$COMMIT \
+    -e GROUP=$GROUP \
     test-container \
     sh -c "export PYTHONPATH=\$PYTHONPATH:\$PWD/test ; python test/$@"
